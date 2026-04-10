@@ -36,7 +36,7 @@
 
 <script>
 // ============================================================
-// RIGGING CONFIGURATION — Change these to rig the wheel!
+// RIGGING CONFIGURATION
 // ============================================================
 var RIGGED = false;
 // Segments alternate: investment, dumb, investment, dumb...
@@ -61,15 +61,15 @@ var useCallback = React.useCallback;
 
 var DUMB_SEGMENTS = [
   { label: "Dates with Women", emoji: "\u{1F48B}", color: "#D62AD0",
-    snark: "He's going to nervously eat pasta across from someone instead of investing. Classic him." },
+    snark: "'Heyyy want to climb and get tacos after?' Yeah we've heard that one before... maybe it will finally lead to a meaningful relationship." },
   { label: "Dinner and Kissing Fights with the Homies", emoji: "\u{1F91C}", color: "#E76F51",
-    snark: "The homies have once again convinced him that Applebee's and violence is a valid expense." },
+    snark: "The homies have once again convinced him that Chili's and romantic violence is a valid expense." },
   { label: "Useless Outdoor Gear", emoji: "\u{1F3D5}\uFE0F", color: "#C1121F",
-    snark: "He now owns another titanium gadget he'll use once and lose in Green Canyon. We tried to stop him." },
+    snark: "He now owns another titanium gadget he'll use once and lose in the Canyon. We tried to stop him." },
   { label: "Mass Quantities of Drugs", emoji: "\u{1F48A}", color: "#E63946",
-    snark: "The pharmacist at CVS is going to judge him so hard for this Benadryl haul." },
+    snark: "The pharmacist at Walgreens is going to judge him so hard for this Benadryl haul." },
   { label: "Mexican Hot Sauce with Extra Lead", emoji: "\u{1F336}\uFE0F", color: "#9B2226",
-    snark: "His brain cells are leaving. His tongue is burning. He says it's worth it. It's not." },
+    snark: "Brain cells are gone. Tongue is burning. He says it's worth it. It's not." },
 ];
 var CHARITY_COLORS = ["#2A9D8F", "#3A6EA5", "#287271", "#5B6ABF", "#1B7A5A"];
 
@@ -244,7 +244,7 @@ function CharityRoulette() {
     var fields = charities.map(function(c, i) {
       return h("div", { key: i, style: { marginBottom: 12 } },
         h("input", { type: "text",
-          placeholder: 'Investment ' + (i + 1) + ' (e.g. "USU Athletics")',
+          placeholder: 'Investment ' + (i + 1),
           value: c,
           onChange: (function(idx) { return function(e) {
             var n = charities.slice(); n[idx] = e.target.value; setCharities(n);
