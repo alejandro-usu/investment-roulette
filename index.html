@@ -51,7 +51,7 @@ var RIGGED = false;
 // Index 7  = "Mass Quantities of Drugs"
 // Index 8  = Investment 5
 // Index 9  = "Mexican Hot Sauce with Extra Lead"
-var RIGGED_INDEX = 1;
+var RIGGED_INDEX = 7;
 // ============================================================
 
 var h = React.createElement;
@@ -62,16 +62,33 @@ var useCallback = React.useCallback;
 
 var DUMB_SEGMENTS = [
   { label: "Dates with Women", emoji: "\u{1F48B}", color: "#D62AD0",
-    snark: "'Heyyy want to climb and get tacos after?' Yeah we've heard that one before... maybe it will finally lead to a meaningful relationship." },
+    snark: "'Heyyy want to climb and get tacos after?' Yeah we've heard that one before... maybe it will finally lead to a meaningful relationship.",
+    snark2: "Twice?? At this point just download Hinge and call it an investment.",
+    snark3: "Three times. He's not dating, he's funding a restaurant's quarterly earnings." },
   { label: "Dinner and Kissing Fights with the Homies", emoji: "\u{1F91C}", color: "#E76F51",
-    snark: "The homies have once again convinced him that Chili's and romantic violence is a valid expense." },
+    snark: "The homies have once again convinced him that Chili's and romantic violence is a valid expense.",
+    snark2: "The homies won again. At this rate they should just move in together and split rent.",
+    snark3: "Three times! The homies now have a standing reservation and a loyalty card at Chili's." },
   { label: "Useless Outdoor Gear", emoji: "\u{1F3D5}\uFE0F", color: "#C1121F",
-    snark: "He now owns another titanium gadget he'll use once and lose in the canyon. We tried to stop him." },
+    snark: "He now owns another titanium gadget he'll use once and lose in the canyon. We tried to stop him.",
+    snark2: "Again? His garage is slowly becoming an REI clearance section.",
+    snark3: "Three outdoor gear hits. He could sponsor a mountaineering expedition at this point." },
   { label: "Mass Quantities of Drugs", emoji: "\u{1F48A}", color: "#E63946",
-    snark: "The pharmacist at Walgreens is going to judge him so hard for this Benadryl haul." },
+    snark: "The pharmacist at Walgreens is going to judge him so hard for this Benadryl haul.",
+    snark2: "Twice! The Walgreens cashier now knows him by first name.",
+    snark3: "Three times. He is single-handedly keeping the pharmaceutical industry afloat." },
   { label: "Mexican Hot Sauce with Extra Lead", emoji: "\u{1F336}\uFE0F", color: "#9B2226",
-    snark: "Brain cells are gone. Tongue is burning. He says it's worth it. It's not." },
+    snark: "Brain cells are gone. Tongue is burning. He says it's worth it. It's not.",
+    snark2: "Twice! His taste buds have filed a restraining order.",
+    snark3: "Three hot sauce hits. At this point the lead content is a personality trait." },
 ];
+
+var INVESTMENT_SNARKS = [
+  "Against all odds, he's investing in something useful. Screenshot this before he changes his mind.",
+  "Wait, the same good decision TWICE? Is the wheel broken or is he actually developing responsibility?",
+  "THREE times on something useful?? Someone check if he's feeling okay. This isn't like him.",
+];
+
 var CHARITY_COLORS = ["#2A9D8F", "#3A6EA5", "#287271", "#5B6ABF", "#1B7A5A"];
 
 // Word-wrap to fit progressively narrowing wedge
@@ -109,20 +126,24 @@ function CharityRoulette() {
   var rotation = rots[0], setRotation = rots[1];
   var cfs = useState(false);
   var showConfetti = cfs[0], setShowConfetti = cfs[1];
+  var hcs = useState({});
+  var hitCounts = hcs[0], setHitCounts = hcs[1];
   var canvasRef = useRef(null);
+  var spinLock = useRef(false);
 
   var segments = [];
   for (var i = 0; i < 5; i++) {
     segments.push({ label: charities[i] || ("Investment " + (i + 1)), emoji: "\u{1F397}\uFE0F", color: CHARITY_COLORS[i], isCharity: true, snark: "" });
     var ds = DUMB_SEGMENTS[i];
-    segments.push({ label: ds.label, emoji: ds.emoji, color: ds.color, isCharity: false, snark: ds.snark });
+    segments.push({ label: ds.label, emoji: ds.emoji, color: ds.color, isCharity: false, snark: ds.snark, snark2: ds.snark2, snark3: ds.snark3 });
   }
 
   var totalSegs = segments.length;
   var segAngle = 360 / totalSegs;
 
   var handleSpin = useCallback(function() {
-    if (spinning) return;
+    if (spinning || spinLock.current) return;
+    spinLock.current = true;
     setSpinning(true);
     setResult(null);
     setShowConfetti(false);
@@ -131,10 +152,6 @@ function CharityRoulette() {
     else { ti = Math.floor(Math.random() * totalSegs); }
     var jitter = (Math.random() - 0.5) * segAngle * 0.5;
     var spins = 5 + Math.floor(Math.random() * 3);
-    // Calculate exact rotation needed so segment ti's center lands under the pointer.
-    // After CSS rotate(R deg), the original angle at the top = (360 - R%360) % 360.
-    // Segment ti's center is at ti*segAngle + segAngle/2.
-    // So we need R%360 = (360 - ti*segAngle - segAngle/2) % 360.
     var desiredMod = ((360 - ti * segAngle - segAngle / 2) % 360 + 360) % 360;
     var currentMod = ((rotation % 360) + 360) % 360;
     var delta = ((desiredMod - currentMod) % 360 + 360) % 360;
@@ -142,12 +159,32 @@ function CharityRoulette() {
     var nr = rotation + target;
     setRotation(nr);
     var segs = segments;
+    var curCounts = hitCounts;
     setTimeout(function() {
+      spinLock.current = false;
       setSpinning(false);
-      setResult(segs[ti]);
-      if (segs[ti].isCharity) setShowConfetti(true);
+      var seg = segs[ti];
+      var count = (curCounts[ti] || 0) + 1;
+      var msg;
+      if (seg.isCharity) {
+        if (count === 1) msg = INVESTMENT_SNARKS[0];
+        else if (count === 2) msg = INVESTMENT_SNARKS[1];
+        else if (count === 3) msg = INVESTMENT_SNARKS[2];
+        else msg = "Again? Wow! That's crazy...";
+      } else {
+        if (count === 1) msg = seg.snark;
+        else if (count === 2) msg = seg.snark2;
+        else if (count === 3) msg = seg.snark3;
+        else msg = "Again? Wow! That's crazy...";
+      }
+      var newCounts = {};
+      for (var k in curCounts) newCounts[k] = curCounts[k];
+      newCounts[ti] = count;
+      setHitCounts(newCounts);
+      setResult({ label: seg.label, emoji: seg.emoji, isCharity: seg.isCharity, color: seg.color, message: msg });
+      if (seg.isCharity) setShowConfetti(true);
     }, 4500);
-  }, [spinning, rotation, totalSegs, segAngle, segments]);
+  }, [spinning, rotation, totalSegs, segAngle, segments, hitCounts]);
 
   useEffect(function() {
     if (!showConfetti || !canvasRef.current) return;
@@ -311,12 +348,9 @@ function CharityRoulette() {
       h("p", { style: { fontSize: 36, marginBottom: 6 } }, result.emoji),
       h("p", { style: { fontFamily: "'Passion One',sans-serif", fontSize: 24,
         color: result.isCharity ? "#2A9D8F" : "#E63946" } }, result.label),
-      h("p", { style: { fontSize: 12, color: "#888", marginTop: 8 } },
-        result.isCharity
-          ? "Against all odds, he's investing in something useful. Screenshot this before he changes his mind."
-          : result.snark)
+      h("p", { style: { fontSize: 12, color: "#888", marginTop: 8 } }, result.message)
     ) : null,
-    h("button", { onClick: function() { setPhase("input"); setResult(null); setRotation(0); setShowConfetti(false); },
+    h("button", { onClick: function() { setPhase("input"); setResult(null); setRotation(0); setShowConfetti(false); setHitCounts({}); },
       style: { padding: "8px 20px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)",
         background: "transparent", color: "#666", fontSize: 12, cursor: "pointer",
         fontFamily: "'Sora',sans-serif" }
@@ -339,11 +373,7 @@ function CharityRoulette() {
     h("div", { className: "layout-container", style: { display: "flex", width: "100%",
       minHeight: "100vh", alignItems: "center", justifyContent: "center" } },
       left, right
-    ),
-    RIGGED ? h("div", { style: { position: "fixed", bottom: 12, right: 12, padding: "6px 12px",
-      borderRadius: 6, background: "rgba(230,57,70,0.2)", border: "1px solid #E63946",
-      fontSize: 10, color: "#E63946", fontFamily: "'Sora',sans-serif", zIndex: 20 }
-    }, "\u{1F527} RIGGED MODE \u2014 Index " + RIGGED_INDEX) : null
+    )
   );
 }
 
