@@ -290,7 +290,7 @@ function CharityRoulette() {
           style: { width: "100%", padding: "12px 14px", borderRadius: 8,
             border: "1px solid rgba(255,255,255,0.1)", background: "rgba(0,0,0,0.3)",
             color: "#e0e0e0", fontSize: 14, fontFamily: "'Sora',sans-serif", outline: "none" },
-          onFocus: function(e) { e.target.style.borderColor = "#2A9D8F"; },
+          onFocus: function(e) { e.target.style.borderColor = "#2A9D8F"; setTimeout(function() { e.target.scrollIntoView({ behavior: "smooth", block: "center" }); }, 300); },
           onBlur: function(e) { e.target.style.borderColor = "rgba(255,255,255,0.1)"; },
         })
       );
