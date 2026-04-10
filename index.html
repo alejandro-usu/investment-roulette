@@ -303,7 +303,7 @@ function CharityRoulette() {
         fontSize: 26, fontWeight: 900, cursor: spinning ? "not-allowed" : "pointer",
         letterSpacing: 2, whiteSpace: "nowrap",
         animation: !spinning && !result ? "pulseBorder 2s infinite" : "none" }
-    }, spinning ? "SPINNING..." : "\u{1F3B0} DECIDE ALEJANDRO'S FATE"),
+    }, spinning ? "SPINNING..." : "\u{1F3B0} SPIN THE WHEEL"),
     result ? h("div", { style: { padding: "20px 24px", borderRadius: 14,
       background: result.isCharity ? "rgba(42,157,143,0.15)" : "rgba(230,57,70,0.12)",
       border: "2px solid " + (result.isCharity ? "#2A9D8F" : "#E63946"),
